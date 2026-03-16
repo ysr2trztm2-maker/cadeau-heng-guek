@@ -455,7 +455,8 @@
 <script>
 const GOAL = 313.88;
 const BIRTHDAY = new Date('2026-03-22T00:00:00');
-const PEOPLE = ['Leng','Tong','Pheng','Léa','Ang','Chhaire','Julie','Seb','Élodie'];
+const DEFAULT_PEOPLE = ['Leng','Tong','Pheng','Léa','Ang','Chhaire','Julie','Seb','Élodie'];
+let PEOPLE = [...DEFAULT_PEOPLE];
 const COLORS = [
   {bg:'#EDE9FC',fg:'#534AB7'},{bg:'#E1F5EE',fg:'#0F6E56'},{bg:'#FAECE7',fg:'#993C1D'},
   {bg:'#E6F1FB',fg:'#185FA5'},{bg:'#FBEAF0',fg:'#993556'},{bg:'#FAEEDA',fg:'#854F0B'},
@@ -467,7 +468,7 @@ const GIST_ID = '65466484b4b3c512ca22bcba9120ae0f';
 const GIST_TOKEN = ['ghp_lI6S7E', 'eQoOCzG1Jpl', 'qXAHPsBr2x2Do1q9nPS'].join('');
 const API_URL = `https://api.github.com/gists/${GIST_ID}`;
 
-let state = { contributions: {}, confirmed: {} };
+let state = { contributions: {}, confirmed: {}, people: null };
 let selectedName = null;
 
 // --- Countdown ---
@@ -811,8 +812,9 @@ async function loadRemote() {
     const r = await fetch(API_URL, { headers: { 'Authorization': 'token ' + GIST_TOKEN } });
     const data = await r.json();
     const content = data.files['data.json'].content;
-    state = JSON.parse(content) || { contributions: {}, confirmed: {} };
+    state = JSON.parse(content) || { contributions: {}, confirmed: {}, people: null };
     if (!state.confirmed) state.confirmed = {};
+    if (state.people && Array.isArray(state.people)) PEOPLE = state.people;
     render();
     setSyncStatus('ok');
   } catch(e) { loadLocal(); setSyncStatus('error'); }
@@ -833,7 +835,11 @@ async function saveRemote() {
 
 function loadLocal() {
   const saved = localStorage.getItem('cagnotte_hengguek');
-  if (saved) { state = JSON.parse(saved); if (!state.confirmed) state.confirmed = {}; }
+  if (saved) {
+    state = JSON.parse(saved);
+    if (!state.confirmed) state.confirmed = {};
+    if (state.people && Array.isArray(state.people)) PEOPLE = state.people;
+  }
   render();
 }
 function saveLocal() { localStorage.setItem('cagnotte_hengguek', JSON.stringify(state)); }
@@ -1003,7 +1009,8 @@ function adminAddPerson() {
   if (!name) { showToast('Entre un prénom'); return; }
   if (PEOPLE.includes(name)) { showToast(name + ' existe déjà'); return; }
   PEOPLE.push(name);
-  // Ne touche pas aux contributions existantes
+  state.people = [...PEOPLE];
+  saveRemote();
   document.getElementById('admin-panel').remove();
   render();
   showToast(`✓ ${name} ajouté`);
@@ -1015,6 +1022,8 @@ function movePerson(idx, dir) {
   const tmp = PEOPLE[idx];
   PEOPLE[idx] = PEOPLE[newIdx];
   PEOPLE[newIdx] = tmp;
+  state.people = [...PEOPLE];
+  saveRemote();
   document.getElementById('admin-panel').remove();
   render();
   showAdminPanel();
@@ -1023,6 +1032,8 @@ function movePerson(idx, dir) {
 function adminRemovePerson(name) {
   const idx = PEOPLE.indexOf(name);
   if (idx > -1) PEOPLE.splice(idx, 1);
+  state.people = [...PEOPLE];
+  saveRemote();
   document.getElementById('admin-panel').remove();
   render();
   showAdminPanel();
