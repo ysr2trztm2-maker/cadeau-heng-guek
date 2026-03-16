@@ -501,7 +501,10 @@ function buildGrid() {
     btn.textContent = p;
     btn.onclick = () => {
       selectedName = p;
-      buildGrid(); updateSuggest(); showToast(`👋 Bonjour ${p} !`);
+      const welcomeMsgs = { 'Tin': ['👋 Tin ! L\'ami du quartier est là, bienvenue dans la famille 💛', '🏘️ Tin ! Depuis l\'enfance jusqu\'ici, merci d\'être là !'] };
+      const wm = welcomeMsgs[p];
+      const welcomeText = wm ? wm[Math.floor(Math.random()*wm.length)] : `👋 Bonjour ${p} !`;
+      buildGrid(); updateSuggest(); showToast(welcomeText);
     };
     grid.appendChild(btn);
   });
@@ -567,6 +570,14 @@ const BOOST_MSGS_ROLE = {
     '👀 Toute la famille observe la belle-sœur… à toi de jouer Elodie !',
     '🏆 La belle-sœur de l\'année met plus que la part suggérée !',
   ],
+  tin: [
+    '🏘️ L\'ami du voisinage qui fait comme la famille… c\'est toi Tin !',
+    '💛 Depuis l\'enfance t\'es là, montre que ça se voit dans le montant !',
+    '😏 On dit que les amis c\'est mieux que la famille… prouve-le Tin !',
+    '🔥 Un ami de toujours c\'est parfois plus généreux qu\'un frère !',
+    '👀 La famille entière te regarde Tin… t\'as grandi avec eux !',
+    '🏆 L\'ami de la famille de l\'année met plus que la part suggérée !',
+  ],
 };
 
 function getBoostMsgs() {
@@ -575,6 +586,7 @@ function getBoostMsgs() {
   if (n === 'elodie') return [...BOOST_MSGS_BASE, ...BOOST_MSGS_ROLE.elodie];
   if (['leng','tong','pheng'].includes(n)) return [...BOOST_MSGS_BASE, ...BOOST_MSGS_ROLE.brothers];
   if (['ang','julie','chhaire','léa','lea'].includes(n)) return [...BOOST_MSGS_BASE, ...BOOST_MSGS_ROLE.sisters];
+  if (n === 'tin') return [...BOOST_MSGS_BASE, ...BOOST_MSGS_ROLE.tin];
   return BOOST_MSGS_BASE;
 }
 
@@ -751,6 +763,16 @@ function getMsg(name, amt) {
              `${amt}€ Seb ! T'es vraiment le beau-frère que toute la famille rêve d'avoir 😎 Grand merci !`],
       epic: [`SEB LÂCHE ${amt}€ !!! Le beau-frère en mode grand seigneur, la famille entière est impressionnée 👑 Heng Guek va te devoir une bière de légende, MERCI !`,
              `${amt}€ Seb ??? T'as officiellement dépassé certains frères de sang dans la famille 😂🏆 MERCI, t'es le meilleur beau-frère !`]
+    },
+    tin: {
+      low:  [`${amt}€ Tin ? L'ami du quartier depuis l'enfance et c'est tout ce que t'as ? 😄 Merci quand même, Heng Guek t'aime comme un frère ! 🙏`,
+             `Tin contribue ${amt}€ — discret comme toujours dans le voisinage 😄 Merci voisin, la famille te remercie du fond du cœur ! 💛`],
+      mid:  [`Tin pose ${amt}€ ! L'ami de toujours est là pour la famille 💛 Merci Tin, Heng Guek est touché par ta présence !`,
+             `${amt}€ de Tin — l'ami du quartier qui assure comme un membre de la famille ! Heng Guek te remercie vraiment 🎉`],
+      good: [`Tin envoie ${amt}€ ! L'ami d'enfance prouve que les vrais amis c'est pour la vie 🔥 MERCI Tin, toute la famille est touchée !`,
+             `${amt}€ Tin ! T'as grandi avec eux et ça se voit dans ta générosité 😍 Grand merci de la part de toute la famille !`],
+      epic: [`TIN LÂCHE ${amt}€ !!! L'ami du voisinage en mode membre de la famille à part entière 👑💛 Heng Guek va se souvenir de toi toute sa vie, MERCI !`,
+             `${amt}€ Tin ??? Depuis l'enfance t'as toujours été là, et aujourd'hui encore tu le prouves 🤩🏆 MERCI, t'es une légende du quartier !`]
     },
     elodie: {
       low:  [`${amt}€ Elodie ? La belle-sœur fait dans la sobriété 😄 Toute la famille te remercie quand même, Heng Guek t'aime !`,
