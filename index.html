@@ -506,7 +506,7 @@ function buildGrid() {
   });
 }
 
-const BOOST_MSGS = [
+const BOOST_MSGS_BASE = [
   '💪 Plus tu mets, plus t\'es un bonhomme !',
   '🔥 Les vrais de la famille mettent plus !',
   '👑 Le plus généreux de la famille, c\'est toi ?',
@@ -533,6 +533,50 @@ const BOOST_MSGS = [
   '🚀 Lance-toi ! Le PC de Heng Guek te bénira éternellement !',
   '😈 Allez, arrondi à la dizaine sup\', ça fait pas de mal !',
 ];
+const BOOST_MSGS_ROLE = {
+  brothers: [
+    '💪 Un grand frère qui met peu… c\'est pas très frère ça !',
+    '😏 On dit que t\'es le radin des grands frères… prouve que c\'est faux !',
+    '🤜 Un vrai grand frère montre l\'exemple, fais honneur à ton rang !',
+    '👀 Tes petits frères regardent… t\'as intérêt à assurer !',
+    '😂 Un grand frère au fond des poches c\'est pas très glorieux hein !',
+    '🔥 Les grands frères légendaires donnent sans compter !',
+  ],
+  sisters: [
+    '💛 Une grande sœur généreuse c\'est la plus aimée de la famille !',
+    '😏 On dit que t\'es la radine des grandes sœurs… prouve que c\'est faux !',
+    '👸 Les grandes sœurs de légende ne font pas dans la moitié !',
+    '🤷 Une grande sœur qui lésine… ça se raconte en famille 😄',
+    '🌸 Montre que les grandes sœurs sont les plus généreuses !',
+    '😂 Allez grande sœur, t\'as sûrement mieux au fond du sac !',
+  ],
+  seb: [
+    '😏 Le beau-frère radin c\'est un classique… casse le mythe Seb !',
+    '💪 Montre à la famille que le beau-frère assure mieux que les frères !',
+    '😂 On dit souvent que les beaux-frères font le minimum… prouve que t\'es pas comme ça !',
+    '🤜 Un beau-frère qui met gros c\'est un beau-frère qu\'on garde ! 😄',
+    '👀 Toute la famille observe le beau-frère… à toi de jouer Seb !',
+    '🏆 Le beau-frère de l\'année met plus que la part suggérée !',
+  ],
+  elodie: [
+    '😏 La belle-sœur radine c\'est un cliché… casse-le Elodie !',
+    '💛 Une belle-sœur généreuse c\'est une belle-sœur adorée de toute la famille !',
+    '😂 On dit souvent que les belles-sœurs font le minimum… prouve que t\'es pas comme ça !',
+    '🌸 Montre que les belles-sœurs sont les plus généreuses de la famille !',
+    '👀 Toute la famille observe la belle-sœur… à toi de jouer Elodie !',
+    '🏆 La belle-sœur de l\'année met plus que la part suggérée !',
+  ],
+};
+
+function getBoostMsgs() {
+  const n = (selectedName || '').toLowerCase();
+  if (n === 'seb') return [...BOOST_MSGS_BASE, ...BOOST_MSGS_ROLE.seb];
+  if (n === 'elodie') return [...BOOST_MSGS_BASE, ...BOOST_MSGS_ROLE.elodie];
+  if (['leng','tong','pheng'].includes(n)) return [...BOOST_MSGS_BASE, ...BOOST_MSGS_ROLE.brothers];
+  if (['ang','julie','chhaire','léa','lea'].includes(n)) return [...BOOST_MSGS_BASE, ...BOOST_MSGS_ROLE.sisters];
+  return BOOST_MSGS_BASE;
+}
+
 let boostIdx = 0;
 let boostInterval = null;
 
@@ -541,10 +585,11 @@ function startBoostRotation() {
   boostInterval = setInterval(() => {
     const el = document.querySelector('#suggest .boost');
     if (!el) return;
+    const msgs = getBoostMsgs();
     el.classList.add('fade');
     setTimeout(() => {
-      boostIdx = (boostIdx + 1) % BOOST_MSGS.length;
-      el.textContent = BOOST_MSGS[boostIdx];
+      boostIdx = (boostIdx + 1) % msgs.length;
+      el.textContent = msgs[boostIdx];
       el.classList.remove('fade');
     }, 400);
   }, 2000);
@@ -563,7 +608,7 @@ function updateSuggest() {
   const el = document.getElementById('suggest');
 
   if (selectedName && share > 0 && !state.contributions[selectedName]) {
-    el.innerHTML = `Part suggérée : <strong>${share} €</strong> pour atteindre l'objectif<span class="boost">${BOOST_MSGS[boostIdx]}</span>`;
+    el.innerHTML = `Part suggérée : <strong>${share} €</strong> pour atteindre l'objectif<span class="boost">${getBoostMsgs()[boostIdx]}</span>`;
     document.getElementById('amt').value = share;
     startBoostRotation();
   } else if (selectedName && state.contributions[selectedName]) {
