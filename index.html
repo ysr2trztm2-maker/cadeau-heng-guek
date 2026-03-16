@@ -644,6 +644,7 @@ function render() {
       <div class="person-info">
         <div class="person-name">${p}</div>
         <div class="person-status">${amt > 0 ? '✓ A confirmé sa contribution' : 'En attente…'}</div>
+        ${amt > 0 ? `<div style="font-size:12px;font-weight:700;color:#C9A96E;margin-top:2px">💛 Merci ${p} !</div>` : ''}
       </div>
       <div style="display:flex;flex-direction:column;align-items:flex-end;gap:3px">
         <div class="person-amt ${amt>0?'paid':'unpaid'}">${amt > 0 ? amt + ' €' : '—'}</div>
