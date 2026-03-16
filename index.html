@@ -477,7 +477,7 @@ function buildGrid() {
       selectedName = p;
       buildGrid(); updateSuggest(); showToast(`👋 Bonjour ${p} !`);
       clearTimeout(window._selectionTimer);
-      window._selectionTimer = setTimeout(() => { selectedName = null; buildGrid(); updateSuggest(); }, 3000);
+      window._selectionTimer = setTimeout(() => { selectedName = null; buildGrid(); updateSuggest(); }, 1000);
     };
     grid.appendChild(btn);
   });
