@@ -747,10 +747,22 @@ function showAdminPanel() {
         </div>
         <button onclick="adminAddPerson()" style="width:100%;padding:10px;background:var(--gold-dark);color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:500;cursor:pointer">+ Ajouter</button>
       </div>
+      <div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--border)">
+        <button onclick="adminReset()" style="width:100%;padding:10px;background:transparent;border:1.5px solid #E24B4A;border-radius:10px;font-size:14px;font-weight:500;color:#E24B4A;cursor:pointer">Réinitialiser la cagnotte</button>
+      </div>
     </div>
   `;
 
   document.body.appendChild(modal);
+}
+
+function adminReset() {
+  if (!confirm('Réinitialiser toutes les contributions ? Cette action est irréversible.')) return;
+  state.contributions = {};
+  saveRemote();
+  document.getElementById('admin-panel').remove();
+  render();
+  showToast('Cagnotte réinitialisée');
 }
 
 function adminAddPerson() {
