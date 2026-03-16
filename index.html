@@ -477,7 +477,7 @@ function buildGrid() {
       selectedName = p;
       buildGrid(); updateSuggest(); showToast(`👋 Bonjour ${p} !`);
       clearTimeout(window._selectionTimer);
-      window._selectionTimer = setTimeout(() => { selectedName = null; buildGrid(); updateSuggest(); }, 1000);
+      window._selectionTimer = setTimeout(() => { selectedName = null; buildGrid(); }, 1000);
     };
     grid.appendChild(btn);
   });
@@ -630,7 +630,7 @@ function showToast(msg) {
   const t = document.getElementById('toast');
   t.textContent = msg;
   t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 8000);
+  setTimeout(() => t.classList.remove('show'), 1000);
 }
 
 // --- Confetti ---
