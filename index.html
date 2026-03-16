@@ -579,7 +579,7 @@ function contribute() {
   document.getElementById('amt').value = '';
   render();
   saveRemote();
-  showToast(getMsg(selectedName, amt));
+  showToast(getMsg(selectedName, amt), 5000);
 }
 
 // --- Sync ---
@@ -624,11 +624,12 @@ function loadLocal() {
 function saveLocal() { localStorage.setItem('cagnotte_hengguek', JSON.stringify(state)); }
 
 // --- Toast ---
-function showToast(msg) {
+function showToast(msg, duration = 2000) {
   const t = document.getElementById('toast');
   t.textContent = msg;
   t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 2000);
+  clearTimeout(window._toastTimer);
+  window._toastTimer = setTimeout(() => t.classList.remove('show'), duration);
 }
 
 // --- Confetti ---
