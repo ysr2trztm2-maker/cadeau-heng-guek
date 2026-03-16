@@ -473,7 +473,12 @@ function buildGrid() {
     btn.className = 'name-btn' + (state.contributions[p] ? ' paid' : '');
     if (p === selectedName) btn.classList.add('selected');
     btn.textContent = p;
-    btn.onclick = () => { selectedName = p; buildGrid(); updateSuggest(); showToast(`👋 Bonjour ${p} !`); };
+    btn.onclick = () => {
+      selectedName = p;
+      buildGrid(); updateSuggest(); showToast(`👋 Bonjour ${p} !`);
+      clearTimeout(window._selectionTimer);
+      window._selectionTimer = setTimeout(() => { selectedName = null; buildGrid(); updateSuggest(); }, 3000);
+    };
     grid.appendChild(btn);
   });
 }
