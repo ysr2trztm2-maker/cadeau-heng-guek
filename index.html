@@ -280,6 +280,10 @@
     font-weight: 700;
     color: #B71C1C;
     letter-spacing: 0.01em;
+    transition: opacity 0.4s ease;
+  }
+  .suggestion .boost.fade {
+    opacity: 0;
   }
 
   /* List card */
@@ -502,6 +506,38 @@ function buildGrid() {
   });
 }
 
+const BOOST_MSGS = [
+  '💪 Plus tu mets, plus t\'es un bonhomme !',
+  '🔥 Les vrais de la famille mettent plus !',
+  '👑 Le plus généreux de la famille, c\'est toi ?',
+  '😎 Montre à la famille qui est le patron !',
+  '🏆 Plus tu donnes, plus Heng Guek t\'aimera fort !',
+  '💛 La famille compte sur les cœurs généreux !',
+  '🎯 Dépasse la part suggérée et deviens une légende !',
+  '🦁 Les lions de la famille donnent sans compter !',
+];
+let boostIdx = 0;
+let boostInterval = null;
+
+function startBoostRotation() {
+  if (boostInterval) return;
+  boostInterval = setInterval(() => {
+    const el = document.querySelector('#suggest .boost');
+    if (!el) return;
+    el.classList.add('fade');
+    setTimeout(() => {
+      boostIdx = (boostIdx + 1) % BOOST_MSGS.length;
+      el.textContent = BOOST_MSGS[boostIdx];
+      el.classList.remove('fade');
+    }, 400);
+  }, 2000);
+}
+
+function stopBoostRotation() {
+  clearInterval(boostInterval);
+  boostInterval = null;
+}
+
 function updateSuggest() {
   const paid = Object.values(state.contributions).reduce((a,b)=>a+b,0);
   const remaining = Math.max(0, GOAL - paid);
@@ -509,24 +545,17 @@ function updateSuggest() {
   const share = unpaid > 0 ? Math.ceil(remaining / unpaid) : 0;
   const el = document.getElementById('suggest');
 
-  const boostMsgs = [
-    '💪 Plus tu mets, plus t\'es un bonhomme !',
-    '🔥 Les vrais de la famille mettent plus !',
-    '👑 Le plus généreux de la famille, c\'est toi ?',
-    '😎 Montre à la famille qui est le patron !',
-    '🏆 Plus tu donnes, plus Heng Guek t\'aimera fort !',
-    '💛 La famille compte sur les coeurs généreux !',
-  ];
-  const boost = boostMsgs[Math.floor(Math.random() * boostMsgs.length)];
-
   if (selectedName && share > 0 && !state.contributions[selectedName]) {
-    el.innerHTML = `Part suggérée : <strong>${share} €</strong> pour atteindre l'objectif<span class="boost">${boost}</span>`;
+    el.innerHTML = `Part suggérée : <strong>${share} €</strong> pour atteindre l'objectif<span class="boost">${BOOST_MSGS[boostIdx]}</span>`;
     document.getElementById('amt').value = share;
+    startBoostRotation();
   } else if (selectedName && state.contributions[selectedName]) {
     el.innerHTML = `${selectedName} a déjà mis <strong>${state.contributions[selectedName]} €</strong><span class="boost">Tu peux modifier ton montant 😉</span>`;
     document.getElementById('amt').value = '';
+    stopBoostRotation();
   } else {
     el.innerHTML = '';
+    stopBoostRotation();
   }
 }
 
