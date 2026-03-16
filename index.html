@@ -437,10 +437,10 @@ const COLORS = [
   {bg:'#EAF3DE',fg:'#3B6D11'},{bg:'#FCF0F0',fg:'#A32D2D'},{bg:'#F1EFE8',fg:'#444441'}
 ];
 
-// JSONBin config — remplacer BIN_ID et API_KEY après création
-const BIN_ID = 'VOTRE_BIN_ID';
-const API_KEY = 'VOTRE_API_KEY';
-const API_URL = `https://api.jsonbin.io/v3/b/${BIN_ID}`;
+// GitHub Gist config
+const GIST_ID = '65466484b4b3c512ca22bcba9120ae0f';
+const GIST_TOKEN = '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';
+const API_URL = `https://api.github.com/gists/${GIST_ID}`;
 
 let state = { contributions: {} };
 let selectedName = null;
@@ -588,25 +588,26 @@ function setSyncStatus(status) {
 }
 
 async function loadRemote() {
-  if (BIN_ID === 'VOTRE_BIN_ID') { loadLocal(); return; }
+  if (GIST_TOKEN === 'VOTRE_TOKEN_GIST') { loadLocal(); return; }
   setSyncStatus('loading');
   try {
-    const r = await fetch(API_URL + '/latest', { headers: { 'X-Master-Key': API_KEY } });
+    const r = await fetch(API_URL, { headers: { 'Authorization': 'token ' + GIST_TOKEN } });
     const data = await r.json();
-    state = data.record || { contributions: {} };
+    const content = data.files['data.json'].content;
+    state = JSON.parse(content) || { contributions: {} };
     render();
     setSyncStatus('ok');
   } catch(e) { loadLocal(); setSyncStatus('error'); }
 }
 
 async function saveRemote() {
-  if (BIN_ID === 'VOTRE_BIN_ID') { saveLocal(); return; }
+  if (GIST_TOKEN === 'VOTRE_TOKEN_GIST') { saveLocal(); return; }
   setSyncStatus('loading');
   try {
     await fetch(API_URL, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json', 'X-Master-Key': API_KEY },
-      body: JSON.stringify(state)
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'token ' + GIST_TOKEN },
+      body: JSON.stringify({ files: { 'data.json': { content: JSON.stringify(state) } } })
     });
     setSyncStatus('ok');
   } catch(e) { saveLocal(); setSyncStatus('error'); }
