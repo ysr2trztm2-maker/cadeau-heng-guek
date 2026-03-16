@@ -467,7 +467,7 @@ const GIST_ID = '65466484b4b3c512ca22bcba9120ae0f';
 const GIST_TOKEN = ['ghp_lI6S7E', 'eQoOCzG1Jpl', 'qXAHPsBr2x2Do1q9nPS'].join('');
 const API_URL = `https://api.github.com/gists/${GIST_ID}`;
 
-let state = { contributions: {} };
+let state = { contributions: {}, confirmed: {} };
 let selectedName = null;
 
 // --- Countdown ---
@@ -645,7 +645,10 @@ function render() {
         <div class="person-name">${p}</div>
         <div class="person-status">${amt > 0 ? '✓ A confirmé sa contribution' : 'En attente…'}</div>
       </div>
-      <div class="person-amt ${amt>0?'paid':'unpaid'}">${amt > 0 ? amt + ' €' : '—'}</div>
+      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:3px">
+        <div class="person-amt ${amt>0?'paid':'unpaid'}">${amt > 0 ? amt + ' €' : '—'}</div>
+        ${state.confirmed[p] ? '<div style="font-size:10px;font-weight:700;color:#fff;background:#2D7A4F;border-radius:6px;padding:2px 7px;letter-spacing:0.03em">Payé ✓</div>' : (amt > 0 ? '<div style="font-size:10px;color:#B71C1C;font-weight:600">En attente paiement</div>' : '')}
+      </div>
     `;
     list.appendChild(row);
   });
@@ -807,7 +810,8 @@ async function loadRemote() {
     const r = await fetch(API_URL, { headers: { 'Authorization': 'token ' + GIST_TOKEN } });
     const data = await r.json();
     const content = data.files['data.json'].content;
-    state = JSON.parse(content) || { contributions: {} };
+    state = JSON.parse(content) || { contributions: {}, confirmed: {} };
+    if (!state.confirmed) state.confirmed = {};
     render();
     setSyncStatus('ok');
   } catch(e) { loadLocal(); setSyncStatus('error'); }
@@ -828,7 +832,7 @@ async function saveRemote() {
 
 function loadLocal() {
   const saved = localStorage.getItem('cagnotte_hengguek');
-  if (saved) state = JSON.parse(saved);
+  if (saved) { state = JSON.parse(saved); if (!state.confirmed) state.confirmed = {}; }
   render();
 }
 function saveLocal() { localStorage.setItem('cagnotte_hengguek', JSON.stringify(state)); }
@@ -932,6 +936,7 @@ function showAdminPanel() {
 
   const peopleRows = PEOPLE.map((p,i) => {
     const amt = state.contributions[p] || 0;
+    const isConfirmed = !!state.confirmed[p];
     return `<div style="display:flex;align-items:center;gap:6px;padding:8px 0;border-bottom:0.5px solid var(--border)">
       <div style="display:flex;flex-direction:column;gap:2px">
         <button onclick="movePerson(${i},-1)" ${i===0?'disabled':''} style="padding:2px 6px;border:0.5px solid var(--border);border-radius:4px;background:var(--bg);font-size:10px;cursor:pointer;color:var(--text-muted);opacity:${i===0?'0.3':'1'}">▲</button>
@@ -939,6 +944,7 @@ function showAdminPanel() {
       </div>
       <div style="flex:1;font-size:13px;color:var(--text)">${p}</div>
       <div style="font-size:13px;font-weight:500;color:${amt>0?'var(--success)':'var(--text-muted)'};min-width:40px;text-align:right">${amt>0?amt+' €':'—'}</div>
+      ${amt > 0 ? `<button onclick="adminToggleConfirm('${p}')" style="padding:4px 8px;background:${isConfirmed?'#2D7A4F':'transparent'};border:1.5px solid #2D7A4F;border-radius:6px;font-size:11px;color:${isConfirmed?'#fff':'#2D7A4F'};cursor:pointer;font-weight:700">${isConfirmed?'Payé ✓':'Confirmer'}</button>` : '<div style="width:64px"></div>'}
       <button onclick="adminRemovePerson('${p}')" style="padding:4px 8px;background:transparent;border:0.5px solid #E8DEC8;border-radius:6px;font-size:11px;color:#E24B4A;cursor:pointer">✕</button>
     </div>`;
   }).join('');
@@ -968,6 +974,18 @@ function showAdminPanel() {
   `;
 
   document.body.appendChild(modal);
+}
+
+function adminToggleConfirm(name) {
+  if (state.confirmed[name]) {
+    delete state.confirmed[name];
+  } else {
+    state.confirmed[name] = true;
+  }
+  saveRemote();
+  render();
+  document.getElementById('admin-panel').remove();
+  showAdminPanel();
 }
 
 function adminReset() {
