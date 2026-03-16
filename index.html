@@ -318,12 +318,12 @@
     color: #fff;
     padding: 28px 36px;
     border-radius: 18px;
-    font-size: 22px;
-    font-weight: 700;
-    line-height: 1.5;
+    font-size: 28px;
+    font-weight: 800;
+    line-height: 1.6;
     text-align: center;
-    max-width: 340px;
-    width: 90%;
+    max-width: 400px;
+    width: 92%;
     box-shadow: 0 8px 32px rgba(0,0,0,0.25);
     opacity: 0;
     transition: transform 0.35s cubic-bezier(.22,.61,.36,1), opacity 0.35s ease;
@@ -574,6 +574,16 @@ function getMsg(name, amt) {
       epic: [`PHENG SORT ${amt}€ !! Le grand frère est en feu aujourd'hui 🔥👑 Heng Guek va te faire un câlin de 10 minutes, MERCI !`,
              `${amt}€ Pheng ??? T'es officiellement le préféré ce soir 😂🏆 MERCI, Heng Guek est sans voix !`]
     },
+    ang: {
+      low:  [`${amt}€ Ang ? Grande sœur un peu chiche ce soir ? 😜 Merci quand même, Heng Guek t'adore !`,
+             `Ang et ses ${amt}€… discret mais présent 😄 Merci grande sœur ! 🙏`],
+      mid:  [`Ang contribue ${amt}€ ! Grande sœur toujours là 💛 Merci beaucoup Ang !`,
+             `${amt}€ d'Ang — fiable et généreuse ! Heng Guek te remercie fort 🎉`],
+      good: [`Ang envoie ${amt}€ ! Grande sœur au grand cœur 🔥 Heng Guek te remercie du fond du cœur, merci Ang !`,
+             `${amt}€ Ang ! T'es vraiment la meilleure 😍 Grand merci de sa part !`],
+      epic: [`ANG LÂCHE ${amt}€ !!! Grande sœur en mode légende 👑💛 Heng Guek va pleurer de joie, MERCI Ang !`,
+             `${amt}€ Ang ??? On est tous témoins de ta générosité 🤩🙇 MERCI infiniment, t'es incroyable !`]
+    },
     julie: {
       low:  [`${amt}€ Julie ? On s'attendait à plus de ta part grande sœur 😜 Merci quand même, Heng Guek t'aime !`,
              `Julie et ses ${amt}€… c'est mignon 😄 Merci grande sœur, Heng Guek est touché ! 🙏`],
@@ -611,7 +621,7 @@ function getMsg(name, amt) {
              `${amt}€ de Seb — solide ! Heng Guek est content de t'avoir dans la famille 🎉 Merci !`],
       good: [`Seb envoie ${amt}€ ! Le beau-frère met la barre haut 🔥 MERCI Seb, Heng Guek est touché !`,
              `${amt}€ Seb ! T'es vraiment le beau-frère qu'on rêve d'avoir 😎 Grand merci !`],
-      epic: [`SEb LÂCHE ${amt}€ !!! Le beau-frère est en mode grand seigneur 👑 Heng Guek va te devoir une fameuse bière, MERCI !`,
+      epic: [`SEB LÂCHE ${amt}€ !!! Le beau-frère est en mode grand seigneur 👑 Heng Guek va te devoir une fameuse bière, MERCI !`,
              `${amt}€ Seb ??? T'as officiellement dépassé certains frères de sang 😂🏆 MERCI, t'es le meilleur beau-frère !`]
     },
     elodie: {
