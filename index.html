@@ -535,39 +535,116 @@ function render() {
 
 // --- Messages drôles selon montant ---
 function getMsg(name, amt) {
-  if (amt < 21) {
-    const msgs = [
-      `${amt}€ ? ${name}, t'as vérifié tes poches ? Y'a peut-être des pièces qui traînent 🪙`,
-      `Honnêtement ${name}… même le distributeur refuse les petites coupures 😅`,
-      `${name} contribue ${amt}€. Courageux. Très courageux. 🫠`,
-      `${amt}€ c'est généreux… pour un café. Pour un PC, on repassera ${name} 😬`
-    ];
-    return msgs[Math.floor(Math.random()*msgs.length)];
-  } else if (amt < 36) {
-    const msgs = [
-      `${amt}€, ça fait le taf ${name} ! Mais on sait que t'as mieux en toi 👀`,
-      `Pas mal ${name} ! Le PC te remercie… à moitié 😄`,
-      `${amt}€ — honnête, correct, sans fioriture. Comme toi ${name} 😏`,
-      `Ça compte ${name} ! Le GPU apprécie même les petites contributions 🖥️`
-    ];
-    return msgs[Math.floor(Math.random()*msgs.length)];
-  } else if (amt < 45) {
-    const msgs = [
-      `Wahou ${name} ! ${amt}€, t'es un vrai ! Heng Guek va s'en souvenir 🎮`,
-      `${name} assure grave avec ses ${amt}€ ! Le setup te remercie 🔥`,
-      `${amt}€ ? ${name} t'es clairement le MVP de la famille là ! 🏆`,
-      `Belle générosité ${name} ! Le futur PC de Heng Guek porte un peu ton âme 😎`
-    ];
-    return msgs[Math.floor(Math.random()*msgs.length)];
-  } else {
-    const msgs = [
-      `${name} lâche ${amt}€ comme si c'était rien !! On est pas dignes 🙇 Le PC va avoir des ailes !`,
-      `RESPECT ${name} ! ${amt}€ — t'as pas fait les choses à moitié. Heng Guek devrait t'offrir un port USB rien qu'à toi 👑`,
-      `${amt}€ ??? ${name} tu rigoles ?! C'est toi le vrai cadeau là 🤩🎁`,
-      `${name} entre dans la légende avec ${amt}€ ! Franchement le PC devrait porter ton prénom 🖥️👑`
-    ];
+  const n = name.toLowerCase();
+  const isBrother = ['leng','tong','pheng'].includes(n);
+  const isSister  = ['julie','chhaire','léa','lea'].includes(n);
+  const isLea     = ['léa','lea'].includes(n);
+  const isSeb     = n === 'seb';
+  const isElodie  = n === 'elodie';
+
+  // Messages personnalisés par personne + tranche de montant
+  const profiles = {
+    leng: {
+      low:  [`${amt}€ Leng ? T'es le grand frère là, même Pheng a sorti plus 😅 Merci quand même, Heng Guek t'aime ! 🙏`,
+             `Leng contribue ${amt}€… tranquille, comme toujours 😄 Merci fréro, ça compte ! 💪`],
+      mid:  [`Leng pose ${amt}€ avec classe ! Le grand frère assure 🤜🤛 Merci beaucoup Leng !`,
+             `${amt}€ de Leng — discret mais efficace ! Heng Guek sera touché 🎉 Merci !`],
+      good: [`Leng envoie ${amt}€ ! Le grand frère montre l'exemple 💪🔥 Heng Guek te remercie du fond du cœur !`,
+             `${amt}€ Leng ! T'as le droit d'être fier de toi 😎 Grand merci de sa part !`],
+      epic: [`LENG LÂCHE ${amt}€ !!! Le grand frère est en mode patron aujourd'hui 👑 Heng Guek va s'en souvenir toute sa vie, MERCI !`,
+             `${amt}€ Leng ??? T'es le MVP des grands frères 🏆🙇 Heng Guek te doit un repas au moins ! MERCI !`]
+    },
+    tong: {
+      low:  [`${amt}€ Tong ? Sérieux ? T'as les mains qui tremblent quand tu payes ? 😂 Merci quand même fréro !`,
+             `Tong et ses ${amt}€… économe jusqu'au bout 😄 On te remercie quand même hein ! 🙏`],
+      mid:  [`Tong sort ${amt}€ ! Pas mal pour quelqu'un qui "vérifie les prix" partout 😏 Merci beaucoup Tong !`,
+             `${amt}€ de Tong — sobre et efficace ! Heng Guek te remercie 🎉`],
+      good: [`Tong assure avec ${amt}€ ! Le grand frère a le cœur grand 🔥 Merci Tong, Heng Guek est touché !`,
+             `${amt}€ Tong ! T'as surpris tout le monde 😄👏 Grand merci de sa part !`],
+      epic: [`TONG ENVOIE ${amt}€ !! On croyait jamais voir ça 😂👑 Heng Guek te remercie infiniment, t'es le best !`,
+             `${amt}€ Tong ??? Tu t'es trompé de montant ou quoi ?! 🤩 MERCI, Heng Guek est aux anges !`]
+    },
+    pheng: {
+      low:  [`${amt}€ Pheng ? Le petit dernier des grands frères fait mieux d'habitude non ? 😅 Merci quand même !`,
+             `Pheng contribue ${amt}€ — c'est un début 😄 Heng Guek te remercie fréro ! 🙏`],
+      mid:  [`Pheng pose ${amt}€ ! Le style, toujours 😎 Merci Pheng, ça fait plaisir !`,
+             `${amt}€ de Pheng — fiable comme toujours ! Heng Guek te remercie 🎉`],
+      good: [`Pheng envoie ${amt}€ ! Grand frère généreux 🔥 Heng Guek est vraiment reconnaissant, merci !`,
+             `${amt}€ Pheng ! T'as mis la barre haut 💪 Grand merci de sa part !`],
+      epic: [`PHENG SORT ${amt}€ !! Le grand frère est en feu aujourd'hui 🔥👑 Heng Guek va te faire un câlin de 10 minutes, MERCI !`,
+             `${amt}€ Pheng ??? T'es officiellement le préféré ce soir 😂🏆 MERCI, Heng Guek est sans voix !`]
+    },
+    julie: {
+      low:  [`${amt}€ Julie ? On s'attendait à plus de ta part grande sœur 😜 Merci quand même, Heng Guek t'aime !`,
+             `Julie et ses ${amt}€… c'est mignon 😄 Merci grande sœur, Heng Guek est touché ! 🙏`],
+      mid:  [`Julie contribue ${amt}€ ! Grande sœur présente 💛 Merci beaucoup Julie !`,
+             `${amt}€ de Julie — toujours là quand il faut ! Heng Guek te remercie fort 🎉`],
+      good: [`Julie envoie ${amt}€ ! Grande sœur au top 🔥 Heng Guek te remercie du fond du cœur, merci Julie !`,
+             `${amt}€ Julie ! T'es la meilleure des grandes sœurs 😍 Grand merci de sa part !`],
+      epic: [`JULIE LÂCHE ${amt}€ !!! Grande sœur en mode légende 👑💛 Heng Guek va pleurer de joie, MERCI Julie !`,
+             `${amt}€ Julie ??? On est tous témoins de ta générosité 🤩🙇 MERCI, t'es incroyable !`]
+    },
+    chhaire: {
+      low:  [`${amt}€ Chhaire ? Grande sœur avare ce soir ? 😂 Merci quand même, Heng Guek t'adore !`,
+             `Chhaire sort ${amt}€ — discret mais présent 😄 Merci grande sœur ! 🙏`],
+      mid:  [`Chhaire contribue ${amt}€ ! Toujours fiable 💛 Merci beaucoup Chhaire !`,
+             `${amt}€ de Chhaire — classe et généreux ! Heng Guek te remercie 🎉`],
+      good: [`Chhaire envoie ${amt}€ ! Grande sœur au grand cœur 🔥 Merci Chhaire, Heng Guek est touché !`,
+             `${amt}€ Chhaire ! T'assures vraiment 💪 Grand merci de sa part !`],
+      epic: [`CHHAIRE SORT ${amt}€ !! Grande sœur en mode grande classe 👑 Heng Guek va se souvenir de toi, MERCI !`,
+             `${amt}€ Chhaire ??? T'es officiellement la plus généreuse des grandes sœurs 🏆 MERCI infiniment !`]
+    },
+    léa: {
+      low:  [`${amt}€ Léa ? T'as organisé tout ça et tu mets ${amt}€ ? 😂 On t'adore quand même ! Merci l'organisatrice !`,
+             `Léa l'organisatrice contribue ${amt}€ — faut bien garder de l'énergie pour gérer les autres 😄 MERCI Léa !`],
+      mid:  [`Léa pose ${amt}€ ! L'organisatrice est aussi généreuse 💛 Heng Guek est doublement chanceux, MERCI !`,
+             `${amt}€ de Léa — organiser ET payer, respect total ! Heng Guek te remercie fort 🎉`],
+      good: [`Léa envoie ${amt}€ ! L'organisatrice assure sur tous les fronts 🔥 MERCI Léa, t'es au top !`,
+             `${amt}€ Léa ! T'as tout géré ET tu mets autant ? T'es incroyable 💪 Grand merci !`],
+      epic: [`LÉAAAAAA ${amt}€ !!! T'as organisé la cagnotte ET tu mets autant ? T'es un mythe 👑 MERCI, Heng Guek est la personne la plus chanceuse du monde !`,
+             `${amt}€ Léa ??? L'organisatrice frappe fort 🤩🏆 MERCI infiniment, sans toi rien de tout ça n'existerait !`]
+    },
+    seb: {
+      low:  [`${amt}€ Seb ? Le beau-frère fait le minimum syndical 😂 Merci quand même, Heng Guek t'apprécie !`,
+             `Seb contribue ${amt}€ — beau-frère économe mais présent 😄 Merci Seb ! 🙏`],
+      mid:  [`Seb sort ${amt}€ ! Le beau-frère assure 💪 Heng Guek te remercie vraiment !`,
+             `${amt}€ de Seb — solide ! Heng Guek est content de t'avoir dans la famille 🎉 Merci !`],
+      good: [`Seb envoie ${amt}€ ! Le beau-frère met la barre haut 🔥 MERCI Seb, Heng Guek est touché !`,
+             `${amt}€ Seb ! T'es vraiment le beau-frère qu'on rêve d'avoir 😎 Grand merci !`],
+      epic: [`SEb LÂCHE ${amt}€ !!! Le beau-frère est en mode grand seigneur 👑 Heng Guek va te devoir une fameuse bière, MERCI !`,
+             `${amt}€ Seb ??? T'as officiellement dépassé certains frères de sang 😂🏆 MERCI, t'es le meilleur beau-frère !`]
+    },
+    elodie: {
+      low:  [`${amt}€ Elodie ? La belle-sœur fait dans la sobriété 😄 Merci quand même, Heng Guek t'aime !`,
+             `Elodie contribue ${amt}€ — discret et sympa 💛 Merci belle-sœur ! 🙏`],
+      mid:  [`Elodie sort ${amt}€ ! La belle-sœur est là 💛 Heng Guek te remercie beaucoup !`,
+             `${amt}€ d'Elodie — toujours présente ! Heng Guek est touché, merci Elodie 🎉`],
+      good: [`Elodie envoie ${amt}€ ! Belle-sœur au grand cœur 🔥 MERCI Elodie, Heng Guek te remercie fort !`,
+             `${amt}€ Elodie ! T'as mis beaucoup d'amour là-dedans 😍 Grand merci de sa part !`],
+      epic: [`ELODIE SORT ${amt}€ !! La belle-sœur est en mode légende 👑💛 Heng Guek est sans voix, MERCI infiniment !`,
+             `${amt}€ Elodie ??? T'es officiellement la belle-sœur de l'année 🏆 MERCI, c'est magnifique !`]
+    }
+  };
+
+  // Tranche de montant
+  const tier = amt < 21 ? 'low' : amt < 36 ? 'mid' : amt < 50 ? 'good' : 'epic';
+
+  // Chercher le profil (avec alias lea/léa)
+  const key = n === 'lea' ? 'léa' : n;
+  if (profiles[key]) {
+    const msgs = profiles[key][tier];
     return msgs[Math.floor(Math.random()*msgs.length)];
   }
+
+  // Fallback générique
+  const fallback = {
+    low:  [`${amt}€ ? ${name}, t'as vérifié tes poches ? 😅 Merci quand même ! 🙏`],
+    mid:  [`${amt}€, ça fait le taf ${name} ! Heng Guek te remercie 🎉`],
+    good: [`Wahou ${name} ! ${amt}€, t'es un vrai ! Merci beaucoup 🔥`],
+    epic: [`${name} lâche ${amt}€ comme si c'était rien !! MERCI, t'es incroyable 👑`]
+  };
+  const fm = fallback[tier];
+  return fm[Math.floor(Math.random()*fm.length)];
 }
 
 // --- Contribute ---
