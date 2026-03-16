@@ -266,12 +266,21 @@
   .btn-submit:hover { background: #7A5C10; }
   .btn-submit:active { transform: scale(0.97); }
   .suggestion {
-    margin-top: 10px;
-    font-size: 12px;
+    margin-top: 12px;
+    font-size: 13px;
     color: var(--text-muted);
     text-align: center;
+    line-height: 1.6;
   }
-  .suggestion strong { color: var(--gold-dark); }
+  .suggestion strong { color: var(--gold-dark); font-size: 16px; }
+  .suggestion .boost {
+    display: block;
+    margin-top: 6px;
+    font-size: 13px;
+    font-weight: 700;
+    color: #B71C1C;
+    letter-spacing: 0.01em;
+  }
 
   /* List card */
   .list-card {
@@ -310,29 +319,41 @@
   .person-amt.unpaid { color: var(--border); }
 
   /* Status messages */
+  @keyframes toastPop {
+    0%   { transform: translate(-50%, -50%) scale(0.5) rotate(-4deg); opacity: 0; }
+    60%  { transform: translate(-50%, -50%) scale(1.08) rotate(1deg); opacity: 1; }
+    80%  { transform: translate(-50%, -50%) scale(0.97) rotate(-0.5deg); }
+    100% { transform: translate(-50%, -50%) scale(1) rotate(0deg); opacity: 1; }
+  }
+  @keyframes toastShake {
+    0%,100% { transform: translate(-50%, -50%) scale(1) rotate(0deg); }
+    20%     { transform: translate(-50%, -50%) scale(1) rotate(-2deg); }
+    40%     { transform: translate(-50%, -50%) scale(1) rotate(2deg); }
+    60%     { transform: translate(-50%, -50%) scale(1) rotate(-1deg); }
+    80%     { transform: translate(-50%, -50%) scale(1) rotate(1deg); }
+  }
   .toast {
     position: fixed;
     top: 50%; left: 50%;
-    transform: translate(-50%, -50%) scale(0.8);
-    background: #D32F2F;
+    transform: translate(-50%, -50%) scale(0.5);
+    background: linear-gradient(135deg, #D32F2F 0%, #B71C1C 100%);
     color: #fff;
-    padding: 28px 36px;
-    border-radius: 18px;
+    padding: 32px 40px;
+    border-radius: 22px;
     font-size: 28px;
     font-weight: 800;
     line-height: 1.6;
     text-align: center;
     max-width: 400px;
     width: 92%;
-    box-shadow: 0 8px 32px rgba(0,0,0,0.25);
+    box-shadow: 0 12px 48px rgba(211,47,47,0.45), 0 2px 8px rgba(0,0,0,0.2);
     opacity: 0;
-    transition: transform 0.35s cubic-bezier(.22,.61,.36,1), opacity 0.35s ease;
     z-index: 99;
     pointer-events: none;
+    border: 2px solid rgba(255,255,255,0.15);
   }
   .toast.show {
-    transform: translate(-50%, -50%) scale(1);
-    opacity: 1;
+    animation: toastPop 0.5s cubic-bezier(.22,.61,.36,1) forwards, toastShake 0.6s ease 0.6s;
   }
 
   .sync-badge {
@@ -487,11 +508,22 @@ function updateSuggest() {
   const unpaid = PEOPLE.filter(p => !state.contributions[p]).length;
   const share = unpaid > 0 ? Math.ceil(remaining / unpaid) : 0;
   const el = document.getElementById('suggest');
+
+  const boostMsgs = [
+    '💪 Plus tu mets, plus t\'es un bonhomme !',
+    '🔥 Les vrais de la famille mettent plus !',
+    '👑 Le plus généreux de la famille, c\'est toi ?',
+    '😎 Montre à la famille qui est le patron !',
+    '🏆 Plus tu donnes, plus Heng Guek t\'aimera fort !',
+    '💛 La famille compte sur les coeurs généreux !',
+  ];
+  const boost = boostMsgs[Math.floor(Math.random() * boostMsgs.length)];
+
   if (selectedName && share > 0 && !state.contributions[selectedName]) {
-    el.innerHTML = `Part suggérée : <strong>${share} €</strong> pour atteindre l'objectif`;
+    el.innerHTML = `Part suggérée : <strong>${share} €</strong> pour atteindre l'objectif<span class="boost">${boost}</span>`;
     document.getElementById('amt').value = share;
   } else if (selectedName && state.contributions[selectedName]) {
-    el.innerHTML = `${selectedName} a déjà mis <strong>${state.contributions[selectedName]} €</strong>`;
+    el.innerHTML = `${selectedName} a déjà mis <strong>${state.contributions[selectedName]} €</strong><span class="boost">Tu peux modifier ton montant 😉</span>`;
     document.getElementById('amt').value = '';
   } else {
     el.innerHTML = '';
@@ -545,94 +577,94 @@ function getMsg(name, amt) {
   // Messages personnalisés par personne + tranche de montant
   const profiles = {
     leng: {
-      low:  [`${amt}€ Leng ? T'es le grand frère là, même Pheng a sorti plus 😅 Merci quand même, Heng Guek t'aime ! 🙏`,
-             `Leng contribue ${amt}€… tranquille, comme toujours 😄 Merci fréro, ça compte ! 💪`],
-      mid:  [`Leng pose ${amt}€ avec classe ! Le grand frère assure 🤜🤛 Merci beaucoup Leng !`,
-             `${amt}€ de Leng — discret mais efficace ! Heng Guek sera touché 🎉 Merci !`],
-      good: [`Leng envoie ${amt}€ ! Le grand frère montre l'exemple 💪🔥 Heng Guek te remercie du fond du cœur !`,
-             `${amt}€ Leng ! T'as le droit d'être fier de toi 😎 Grand merci de sa part !`],
-      epic: [`LENG LÂCHE ${amt}€ !!! Le grand frère est en mode patron aujourd'hui 👑 Heng Guek va s'en souvenir toute sa vie, MERCI !`,
-             `${amt}€ Leng ??? T'es le MVP des grands frères 🏆🙇 Heng Guek te doit un repas au moins ! MERCI !`]
+      low:  [`${amt}€ Leng ? T'es le grand frère là, même Pheng a sorti plus 😅 Toute la famille te remercie quand même, Heng Guek t'aime fréro ! 🙏`,
+             `Leng contribue ${amt}€… tranquille comme toujours 😄 La famille est là, merci grand frère, ça compte ! 💪`],
+      mid:  [`Leng pose ${amt}€ avec classe ! Le grand frère qui assure, toute la famille est fière 🤜🤛 MERCI Leng !`,
+             `${amt}€ de Leng — le grand frère discret mais efficace ! Heng Guek et toute la famille te remercient 🎉`],
+      good: [`Leng envoie ${amt}€ ! Le grand frère montre l'exemple à toute la famille 💪🔥 Heng Guek te remercie du fond du cœur, t'es le meilleur !`,
+             `${amt}€ Leng ! T'as le droit d'être fier, la famille aussi 😎 Grand merci de la part de tous !`],
+      epic: [`LENG LÂCHE ${amt}€ !!! Le grand frère en mode patron, toute la famille s'incline 👑 Heng Guek va s'en souvenir toute sa vie, MERCI LENG !`,
+             `${amt}€ Leng ??? T'es le MVP de la famille ce soir 🏆🙇 Heng Guek te doit un repas, et la famille entière te salue ! MERCI !`]
     },
     tong: {
-      low:  [`${amt}€ Tong ? Sérieux ? T'as les mains qui tremblent quand tu payes ? 😂 Merci quand même fréro !`,
-             `Tong et ses ${amt}€… économe jusqu'au bout 😄 On te remercie quand même hein ! 🙏`],
-      mid:  [`Tong sort ${amt}€ ! Pas mal pour quelqu'un qui "vérifie les prix" partout 😏 Merci beaucoup Tong !`,
-             `${amt}€ de Tong — sobre et efficace ! Heng Guek te remercie 🎉`],
-      good: [`Tong assure avec ${amt}€ ! Le grand frère a le cœur grand 🔥 Merci Tong, Heng Guek est touché !`,
-             `${amt}€ Tong ! T'as surpris tout le monde 😄👏 Grand merci de sa part !`],
-      epic: [`TONG ENVOIE ${amt}€ !! On croyait jamais voir ça 😂👑 Heng Guek te remercie infiniment, t'es le best !`,
-             `${amt}€ Tong ??? Tu t'es trompé de montant ou quoi ?! 🤩 MERCI, Heng Guek est aux anges !`]
+      low:  [`${amt}€ Tong ? T'as les mains qui tremblent quand tu payes ? 😂 Toute la famille te remercie quand même fréro, Heng Guek t'aime ! 🙏`,
+             `Tong et ses ${amt}€… économe jusqu'au bout 😄 La famille est là et ça compte, merci Tong ! 🙏`],
+      mid:  [`Tong sort ${amt}€ ! Pas mal pour quelqu'un qui "vérifie les prix" 😏 La famille est fière, merci beaucoup Tong !`,
+             `${amt}€ de Tong — sobre et efficace, comme toujours en famille ! Heng Guek te remercie 🎉`],
+      good: [`Tong assure avec ${amt}€ ! Le grand frère au grand cœur, toute la famille est touchée 🔥 Merci Tong, Heng Guek est aux anges !`,
+             `${amt}€ Tong ! T'as surpris tout le monde dans la famille 😄👏 Grand merci de la part de tous !`],
+      epic: [`TONG ENVOIE ${amt}€ !! On croyait jamais voir ça dans la famille 😂👑 Heng Guek te remercie infiniment, t'es le best fréro !`,
+             `${amt}€ Tong ??? T'es trompé de montant ou tu voulais vraiment écraser la famille ? 🤩 MERCI, Heng Guek est aux anges !`]
     },
     pheng: {
-      low:  [`${amt}€ Pheng ? Le petit dernier des grands frères fait mieux d'habitude non ? 😅 Merci quand même !`,
-             `Pheng contribue ${amt}€ — c'est un début 😄 Heng Guek te remercie fréro ! 🙏`],
-      mid:  [`Pheng pose ${amt}€ ! Le style, toujours 😎 Merci Pheng, ça fait plaisir !`,
-             `${amt}€ de Pheng — fiable comme toujours ! Heng Guek te remercie 🎉`],
-      good: [`Pheng envoie ${amt}€ ! Grand frère généreux 🔥 Heng Guek est vraiment reconnaissant, merci !`,
-             `${amt}€ Pheng ! T'as mis la barre haut 💪 Grand merci de sa part !`],
-      epic: [`PHENG SORT ${amt}€ !! Le grand frère est en feu aujourd'hui 🔥👑 Heng Guek va te faire un câlin de 10 minutes, MERCI !`,
-             `${amt}€ Pheng ??? T'es officiellement le préféré ce soir 😂🏆 MERCI, Heng Guek est sans voix !`]
+      low:  [`${amt}€ Pheng ? Le petit dernier des grands frères peut faire mieux ! 😅 Toute la famille te remercie quand même, Heng Guek t'aime fréro !`,
+             `Pheng contribue ${amt}€ — c'est un début 😄 La famille est là, merci Pheng ! 🙏`],
+      mid:  [`Pheng pose ${amt}€ ! Le style, toujours, et la famille apprécie 😎 Merci Pheng, ça fait vraiment plaisir !`,
+             `${amt}€ de Pheng — fiable comme toujours en famille ! Heng Guek te remercie beaucoup 🎉`],
+      good: [`Pheng envoie ${amt}€ ! Grand frère généreux, toute la famille est fière de toi 🔥 Heng Guek est vraiment reconnaissant, MERCI !`,
+             `${amt}€ Pheng ! T'as mis la barre haut pour la famille 💪 Grand merci de la part de tous !`],
+      epic: [`PHENG SORT ${amt}€ !! Le grand frère est en feu, la famille entière applaudit 🔥👑 Heng Guek va te faire un câlin de 10 minutes, MERCI !`,
+             `${amt}€ Pheng ??? T'es officiellement le chouchou de la famille ce soir 😂🏆 MERCI, Heng Guek est sans voix !`]
     },
     ang: {
-      low:  [`${amt}€ Ang ? Grande sœur un peu chiche ce soir ? 😜 Merci quand même, Heng Guek t'adore !`,
-             `Ang et ses ${amt}€… discret mais présent 😄 Merci grande sœur ! 🙏`],
-      mid:  [`Ang contribue ${amt}€ ! Grande sœur toujours là 💛 Merci beaucoup Ang !`,
-             `${amt}€ d'Ang — fiable et généreuse ! Heng Guek te remercie fort 🎉`],
-      good: [`Ang envoie ${amt}€ ! Grande sœur au grand cœur 🔥 Heng Guek te remercie du fond du cœur, merci Ang !`,
-             `${amt}€ Ang ! T'es vraiment la meilleure 😍 Grand merci de sa part !`],
-      epic: [`ANG LÂCHE ${amt}€ !!! Grande sœur en mode légende 👑💛 Heng Guek va pleurer de joie, MERCI Ang !`,
-             `${amt}€ Ang ??? On est tous témoins de ta générosité 🤩🙇 MERCI infiniment, t'es incroyable !`]
+      low:  [`${amt}€ Ang ? Grande sœur un peu chiche ce soir ? 😜 Toute la famille te remercie quand même, Heng Guek t'adore !`,
+             `Ang et ses ${amt}€… discret mais présent 😄 La famille compte sur toi, merci grande sœur ! 🙏`],
+      mid:  [`Ang contribue ${amt}€ ! Grande sœur toujours présente pour la famille 💛 Merci beaucoup Ang, Heng Guek est touché !`,
+             `${amt}€ d'Ang — fiable et généreuse, la famille peut compter sur toi ! Heng Guek te remercie fort 🎉`],
+      good: [`Ang envoie ${amt}€ ! Grande sœur au grand cœur, toute la famille est fière 🔥 Heng Guek te remercie du fond du cœur, merci Ang !`,
+             `${amt}€ Ang ! T'es vraiment la grande sœur dont la famille a besoin 😍 Grand merci de la part de tous !`],
+      epic: [`ANG LÂCHE ${amt}€ !!! Grande sœur en mode légende, la famille entière est soufflée 👑💛 Heng Guek va pleurer de joie, MERCI Ang !`,
+             `${amt}€ Ang ??? Toute la famille est témoin de ta générosité 🤩🙇 MERCI infiniment, t'es la meilleure !`]
     },
     julie: {
-      low:  [`${amt}€ Julie ? On s'attendait à plus de ta part grande sœur 😜 Merci quand même, Heng Guek t'aime !`,
-             `Julie et ses ${amt}€… c'est mignon 😄 Merci grande sœur, Heng Guek est touché ! 🙏`],
-      mid:  [`Julie contribue ${amt}€ ! Grande sœur présente 💛 Merci beaucoup Julie !`,
-             `${amt}€ de Julie — toujours là quand il faut ! Heng Guek te remercie fort 🎉`],
-      good: [`Julie envoie ${amt}€ ! Grande sœur au top 🔥 Heng Guek te remercie du fond du cœur, merci Julie !`,
-             `${amt}€ Julie ! T'es la meilleure des grandes sœurs 😍 Grand merci de sa part !`],
-      epic: [`JULIE LÂCHE ${amt}€ !!! Grande sœur en mode légende 👑💛 Heng Guek va pleurer de joie, MERCI Julie !`,
-             `${amt}€ Julie ??? On est tous témoins de ta générosité 🤩🙇 MERCI, t'es incroyable !`]
+      low:  [`${amt}€ Julie ? On s'attendait à plus de la grande sœur ! 😜 Toute la famille te remercie quand même, Heng Guek t'aime !`,
+             `Julie et ses ${amt}€… c'est mignon 😄 La famille est là, merci grande sœur, Heng Guek est touché ! 🙏`],
+      mid:  [`Julie contribue ${amt}€ ! Grande sœur présente pour la famille 💛 Merci beaucoup Julie, ça compte pour tout le monde !`,
+             `${amt}€ de Julie — toujours là quand la famille a besoin ! Heng Guek te remercie fort 🎉`],
+      good: [`Julie envoie ${amt}€ ! Grande sœur au top, toute la famille est fière 🔥 Heng Guek te remercie du fond du cœur, merci Julie !`,
+             `${amt}€ Julie ! T'es la grande sœur dont la famille est fière 😍 Grand merci de la part de tous !`],
+      epic: [`JULIE LÂCHE ${amt}€ !!! Grande sœur en mode légende, toute la famille s'incline 👑💛 Heng Guek va pleurer de joie, MERCI Julie !`,
+             `${amt}€ Julie ??? La famille entière est témoin de ta générosité 🤩🙇 MERCI, t'es incroyable !`]
     },
     chhaire: {
-      low:  [`${amt}€ Chhaire ? Grande sœur avare ce soir ? 😂 Merci quand même, Heng Guek t'adore !`,
-             `Chhaire sort ${amt}€ — discret mais présent 😄 Merci grande sœur ! 🙏`],
-      mid:  [`Chhaire contribue ${amt}€ ! Toujours fiable 💛 Merci beaucoup Chhaire !`,
-             `${amt}€ de Chhaire — classe et généreux ! Heng Guek te remercie 🎉`],
-      good: [`Chhaire envoie ${amt}€ ! Grande sœur au grand cœur 🔥 Merci Chhaire, Heng Guek est touché !`,
-             `${amt}€ Chhaire ! T'assures vraiment 💪 Grand merci de sa part !`],
-      epic: [`CHHAIRE SORT ${amt}€ !! Grande sœur en mode grande classe 👑 Heng Guek va se souvenir de toi, MERCI !`,
-             `${amt}€ Chhaire ??? T'es officiellement la plus généreuse des grandes sœurs 🏆 MERCI infiniment !`]
+      low:  [`${amt}€ Chhaire ? Grande sœur un peu avare ce soir ? 😂 Toute la famille te remercie quand même, Heng Guek t'adore !`,
+             `Chhaire sort ${amt}€ — discret mais présent 😄 La famille est là, merci grande sœur ! 🙏`],
+      mid:  [`Chhaire contribue ${amt}€ ! Toujours fiable pour la famille 💛 Merci beaucoup Chhaire, Heng Guek est touché !`,
+             `${amt}€ de Chhaire — classe et généreuse, comme toujours en famille ! Heng Guek te remercie 🎉`],
+      good: [`Chhaire envoie ${amt}€ ! Grande sœur au grand cœur, toute la famille est touchée 🔥 Merci Chhaire, Heng Guek est vraiment reconnaissant !`,
+             `${amt}€ Chhaire ! T'assures vraiment pour la famille 💪 Grand merci de la part de tous !`],
+      epic: [`CHHAIRE SORT ${amt}€ !! Grande sœur en mode grande classe, la famille entière applaudit 👑 Heng Guek va se souvenir de toi toute sa vie, MERCI !`,
+             `${amt}€ Chhaire ??? T'es officiellement la plus généreuse de la famille ce soir 🏆 MERCI infiniment, t'es une légende !`]
     },
     léa: {
-      low:  [`${amt}€ Léa ? T'as organisé tout ça et tu mets ${amt}€ ? 😂 On t'adore quand même ! Merci l'organisatrice !`,
-             `Léa l'organisatrice contribue ${amt}€ — faut bien garder de l'énergie pour gérer les autres 😄 MERCI Léa !`],
-      mid:  [`Léa pose ${amt}€ ! L'organisatrice est aussi généreuse 💛 Heng Guek est doublement chanceux, MERCI !`,
-             `${amt}€ de Léa — organiser ET payer, respect total ! Heng Guek te remercie fort 🎉`],
-      good: [`Léa envoie ${amt}€ ! L'organisatrice assure sur tous les fronts 🔥 MERCI Léa, t'es au top !`,
-             `${amt}€ Léa ! T'as tout géré ET tu mets autant ? T'es incroyable 💪 Grand merci !`],
-      epic: [`LÉAAAAAA ${amt}€ !!! T'as organisé la cagnotte ET tu mets autant ? T'es un mythe 👑 MERCI, Heng Guek est la personne la plus chanceuse du monde !`,
-             `${amt}€ Léa ??? L'organisatrice frappe fort 🤩🏆 MERCI infiniment, sans toi rien de tout ça n'existerait !`]
+      low:  [`${amt}€ Léa ? T'as tout organisé pour la famille ET tu mets ${amt}€ ? 😂 La famille t'adore quand même, MERCI l'organisatrice !`,
+             `Léa l'organisatrice de la famille contribue ${amt}€ — faut garder de l'énergie pour gérer tout le monde 😄 MERCI Léa, sans toi on serait perdus !`],
+      mid:  [`Léa pose ${amt}€ ! L'organisatrice de la famille est aussi généreuse 💛 Heng Guek est doublement chanceux d'avoir une sœur comme toi, MERCI !`,
+             `${amt}€ de Léa — organiser toute la famille ET payer, respect total ! Heng Guek te remercie du fond du cœur 🎉`],
+      good: [`Léa envoie ${amt}€ ! L'organisatrice assure sur tous les fronts pour la famille 🔥 MERCI Léa, t'es vraiment au top, Heng Guek est fier de toi !`,
+             `${amt}€ Léa ! T'as tout géré pour la famille ET tu mets autant ? T'es incroyable 💪 Grand merci de la part de tous !`],
+      epic: [`LÉAAAAAA ${amt}€ !!! T'as organisé toute la cagnotte de la famille ET tu mets autant ? T'es un mythe absolu 👑 MERCI, Heng Guek est la personne la plus chanceuse du monde !`,
+             `${amt}€ Léa ??? L'organisatrice de la famille frappe très fort 🤩🏆 MERCI infiniment Léa, sans toi rien de tout ça n'existerait pour la famille !`]
     },
     seb: {
-      low:  [`${amt}€ Seb ? Le beau-frère fait le minimum syndical 😂 Merci quand même, Heng Guek t'apprécie !`,
-             `Seb contribue ${amt}€ — beau-frère économe mais présent 😄 Merci Seb ! 🙏`],
-      mid:  [`Seb sort ${amt}€ ! Le beau-frère assure 💪 Heng Guek te remercie vraiment !`,
-             `${amt}€ de Seb — solide ! Heng Guek est content de t'avoir dans la famille 🎉 Merci !`],
-      good: [`Seb envoie ${amt}€ ! Le beau-frère met la barre haut 🔥 MERCI Seb, Heng Guek est touché !`,
-             `${amt}€ Seb ! T'es vraiment le beau-frère qu'on rêve d'avoir 😎 Grand merci !`],
-      epic: [`SEB LÂCHE ${amt}€ !!! Le beau-frère est en mode grand seigneur 👑 Heng Guek va te devoir une fameuse bière, MERCI !`,
-             `${amt}€ Seb ??? T'as officiellement dépassé certains frères de sang 😂🏆 MERCI, t'es le meilleur beau-frère !`]
+      low:  [`${amt}€ Seb ? Le beau-frère fait le minimum syndical 😂 La famille te remercie quand même, Heng Guek t'apprécie !`,
+             `Seb contribue ${amt}€ — beau-frère économe mais présent dans la famille 😄 Merci Seb ! 🙏`],
+      mid:  [`Seb sort ${amt}€ ! Le beau-frère assure pour la famille 💪 Heng Guek et toute la famille te remercient vraiment !`,
+             `${amt}€ de Seb — solide ! La famille est contente de t'avoir parmi nous 🎉 Merci beau-frère !`],
+      good: [`Seb envoie ${amt}€ ! Le beau-frère met la barre haut dans la famille 🔥 MERCI Seb, Heng Guek et toute la famille sont touchés !`,
+             `${amt}€ Seb ! T'es vraiment le beau-frère que toute la famille rêve d'avoir 😎 Grand merci !`],
+      epic: [`SEB LÂCHE ${amt}€ !!! Le beau-frère en mode grand seigneur, la famille entière est impressionnée 👑 Heng Guek va te devoir une bière de légende, MERCI !`,
+             `${amt}€ Seb ??? T'as officiellement dépassé certains frères de sang dans la famille 😂🏆 MERCI, t'es le meilleur beau-frère !`]
     },
     elodie: {
-      low:  [`${amt}€ Elodie ? La belle-sœur fait dans la sobriété 😄 Merci quand même, Heng Guek t'aime !`,
-             `Elodie contribue ${amt}€ — discret et sympa 💛 Merci belle-sœur ! 🙏`],
-      mid:  [`Elodie sort ${amt}€ ! La belle-sœur est là 💛 Heng Guek te remercie beaucoup !`,
-             `${amt}€ d'Elodie — toujours présente ! Heng Guek est touché, merci Elodie 🎉`],
-      good: [`Elodie envoie ${amt}€ ! Belle-sœur au grand cœur 🔥 MERCI Elodie, Heng Guek te remercie fort !`,
-             `${amt}€ Elodie ! T'as mis beaucoup d'amour là-dedans 😍 Grand merci de sa part !`],
-      epic: [`ELODIE SORT ${amt}€ !! La belle-sœur est en mode légende 👑💛 Heng Guek est sans voix, MERCI infiniment !`,
-             `${amt}€ Elodie ??? T'es officiellement la belle-sœur de l'année 🏆 MERCI, c'est magnifique !`]
+      low:  [`${amt}€ Elodie ? La belle-sœur fait dans la sobriété 😄 Toute la famille te remercie quand même, Heng Guek t'aime !`,
+             `Elodie contribue ${amt}€ — discrète mais présente dans la famille 💛 Merci belle-sœur ! 🙏`],
+      mid:  [`Elodie sort ${amt}€ ! La belle-sœur est là pour la famille 💛 Heng Guek et toute la famille te remercient beaucoup !`,
+             `${amt}€ d'Elodie — toujours présente quand la famille a besoin ! Heng Guek est touché, merci Elodie 🎉`],
+      good: [`Elodie envoie ${amt}€ ! Belle-sœur au grand cœur, toute la famille est touchée 🔥 MERCI Elodie, Heng Guek te remercie fort !`,
+             `${amt}€ Elodie ! T'as mis beaucoup d'amour pour la famille 😍 Grand merci de la part de tous !`],
+      epic: [`ELODIE SORT ${amt}€ !! La belle-sœur en mode légende, toute la famille est soufflée 👑💛 Heng Guek est sans voix, MERCI infiniment !`,
+             `${amt}€ Elodie ??? T'es officiellement la belle-sœur de l'année pour toute la famille 🏆 MERCI, c'est magnifique !`]
     }
   };
 
