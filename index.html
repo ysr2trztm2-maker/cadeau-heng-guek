@@ -414,6 +414,7 @@
       <span class="progress-pct" id="pct">0%</span>
     </div>
     <div class="bar-track"><div class="bar-fill" id="bar" style="width:0%"></div></div>
+    <div id="remaining-msg" style="text-align:center;margin:10px 0 4px;font-size:15px;font-weight:700;letter-spacing:0.01em;"></div>
     <div class="stats-row">
       <div class="stat"><span class="stat-val" id="s-collected">0 €</span><span class="stat-lbl">Collecté</span></div>
       <div class="stat"><span class="stat-val" id="s-remaining">300 €</span><span class="stat-lbl">Restant</span></div>
@@ -642,7 +643,22 @@ function render() {
   document.getElementById('bar').style.width = pct + '%';
   document.getElementById('pct').textContent = pct + '%';
   document.getElementById('s-collected').textContent = paid + ' €';
-  document.getElementById('s-remaining').textContent = Math.max(0, GOAL - paid) + ' €';
+  const rem = Math.max(0, GOAL - paid);
+  document.getElementById('s-remaining').textContent = rem + ' €';
+  const remMsg = document.getElementById('remaining-msg');
+  if (rem <= 0) {
+    remMsg.style.color = '#10B981';
+    remMsg.textContent = '🎉 Objectif atteint ! Merci à tous !';
+  } else if (rem <= 30) {
+    remMsg.style.color = '#FF0080';
+    remMsg.textContent = `🔥 Plus que ${rem} € !! On y est presque, qui finit ?!`;
+  } else if (rem <= 80) {
+    remMsg.style.color = '#FF9900';
+    remMsg.textContent = `⚡ Plus que ${rem} € pour atteindre l'objectif !`;
+  } else {
+    remMsg.style.color = '#A855F7';
+    remMsg.textContent = `🎯 Plus que ${rem} € pour offrir le meilleur cadeau à Heng Guek !`;
+  }
   const count = Object.keys(state.contributions).length;
   document.getElementById('s-count').textContent = count + '/' + PEOPLE.length;
 
