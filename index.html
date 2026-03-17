@@ -7,16 +7,16 @@
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
   :root {
-    --gold: #C9A96E;
-    --gold-light: #F0DDB8;
-    --gold-dark: #8B6914;
-    --bg: #FAF7F2;
-    --surface: #FFFFFF;
-    --text: #1A1208;
-    --text-muted: #7A6840;
-    --border: #E8DEC8;
-    --success: #2D7A4F;
-    --success-bg: #EAF5EE;
+    --gold: #A855F7;
+    --gold-light: #E9D5FF;
+    --gold-dark: #7C3AED;
+    --bg: #0D1117;
+    --surface: #161B22;
+    --text: #F0F4FF;
+    --text-muted: #8B9DD4;
+    --border: #30363D;
+    --success: #10B981;
+    --success-bg: #052e1c;
     --radius: 16px;
   }
 
@@ -35,7 +35,7 @@
     position: fixed;
     top: -120px; right: -120px;
     width: 400px; height: 400px;
-    background: radial-gradient(circle, rgba(201,169,110,0.12) 0%, transparent 70%);
+    background: radial-gradient(circle, rgba(168,85,247,0.15) 0%, transparent 70%);
     pointer-events: none;
   }
 
@@ -116,8 +116,8 @@
     position: absolute;
     bottom: 0; left: 0; right: 0;
     height: 3px;
-    background: linear-gradient(90deg, var(--gold), var(--gold-light));
-    opacity: 0.4;
+    background: linear-gradient(90deg, #00D4FF, #A855F7, #FF0080);
+    opacity: 0.8;
   }
   .progress-header {
     display: flex;
@@ -141,7 +141,7 @@
   }
   .bar-fill {
     height: 100%;
-    background: linear-gradient(90deg, var(--gold-dark), var(--gold));
+    background: linear-gradient(90deg, #00D4FF, #A855F7, #FF0080);
     border-radius: 20px;
     transition: width 0.6s cubic-bezier(.22,.61,.36,1);
   }
@@ -200,7 +200,7 @@
     transition: all 0.15s;
     position: relative;
   }
-  .name-btn:hover { border-color: var(--gold); background: #FDF8EF; }
+  .name-btn:hover { border-color: var(--gold); background: #1f1535; }
   .name-btn.selected {
     background: var(--gold-dark);
     color: #fff;
@@ -208,8 +208,8 @@
     font-weight: 500;
   }
   .name-btn.paid {
-    background: var(--success-bg);
-    border-color: #A8D5BC;
+    background: #052e1c;
+    border-color: #10B981;
     color: var(--success);
   }
   .name-btn.paid::after {
@@ -263,7 +263,7 @@
     transition: background 0.15s, transform 0.1s;
     white-space: nowrap;
   }
-  .btn-submit:hover { background: #7A5C10; }
+  .btn-submit:hover { background: #6D28D9; }
   .btn-submit:active { transform: scale(0.97); }
   .suggestion {
     margin-top: 12px;
