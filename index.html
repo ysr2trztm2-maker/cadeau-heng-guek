@@ -1053,6 +1053,9 @@ function showAdminPanel() {
       <div style="font-size:11px;color:var(--text-muted);margin-bottom:12px;background:#FFF8EE;padding:8px 12px;border-radius:8px;">
         ⚠️ Supprimer quelqu'un ne supprime pas son montant du total.
       </div>
+      <div style="margin-bottom:16px;padding-bottom:16px;border-bottom:1px solid var(--border)">
+        <button onclick="adminCloseFundraiser()" style="width:100%;padding:12px;background:${state.closed ? 'transparent' : '#7C3AED'};border:2px solid ${state.closed ? '#10B981' : '#7C3AED'};border-radius:10px;font-size:15px;font-weight:700;color:${state.closed ? '#10B981' : '#fff'};cursor:pointer">${state.closed ? '🔓 Rouvrir la cagnotte' : '🔒 Clôturer la cagnotte'}</button>
+      </div>
       <div style="font-size:12px;font-weight:500;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:8px">Participants</div>
       ${peopleRows}
       <div style="margin-top:20px;padding-top:16px;border-top:1px solid var(--border)">
@@ -1063,7 +1066,6 @@ function showAdminPanel() {
         <button onclick="adminAddPerson()" style="width:100%;padding:10px;background:var(--gold-dark);color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:500;cursor:pointer">+ Ajouter</button>
       </div>
       <div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--border)">
-        <button onclick="adminCloseFundraiser()" style="width:100%;padding:10px;background:${state.closed ? 'transparent' : 'var(--gold-dark)'};border:1.5px solid ${state.closed ? '#10B981' : 'var(--gold-dark)'};border-radius:10px;font-size:14px;font-weight:500;color:${state.closed ? '#10B981' : '#fff'};cursor:pointer;margin-bottom:10px">${state.closed ? '🔓 Rouvrir la cagnotte' : '🔒 Clôturer la cagnotte'}</button>
         <button onclick="adminReset()" style="width:100%;padding:10px;background:transparent;border:1.5px solid #E24B4A;border-radius:10px;font-size:14px;font-weight:500;color:#E24B4A;cursor:pointer">Réinitialiser la cagnotte</button>
       </div>
     </div>
