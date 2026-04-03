@@ -422,7 +422,7 @@
     </div>
   </div>
 
-  <div class="form-card">
+  <div class="form-card" id="form-card">
     <div class="card-title">Je participe</div>
     <div class="select-grid" id="name-grid"></div>
     <div class="amount-row">
@@ -434,6 +434,8 @@
     </div>
     <div class="suggestion" id="suggest"></div>
   </div>
+
+  <div class="form-card" id="closed-banner" style="display:none"></div>
 
   <div class="list-card">
     <div class="card-title" style="margin-bottom:10px">Contributions</div>
@@ -469,7 +471,7 @@ const GIST_ID = '65466484b4b3c512ca22bcba9120ae0f';
 const GIST_TOKEN = ['ghp_lI6S7E', 'eQoOCzG1Jpl', 'qXAHPsBr2x2Do1q9nPS'].join('');
 const API_URL = `https://api.github.com/gists/${GIST_ID}`;
 
-let state = { contributions: {}, confirmed: {}, people: null };
+let state = { contributions: {}, confirmed: {}, people: null, closed: false };
 let selectedName = null;
 
 // --- Countdown ---
@@ -500,13 +502,19 @@ function buildGrid() {
     btn.className = 'name-btn' + (state.contributions[p] ? ' paid' : '');
     if (p === selectedName) btn.classList.add('selected');
     btn.textContent = p;
-    btn.onclick = () => {
-      selectedName = p;
-      const welcomeMsgs = { 'Tin': ['👋 Tin ! Notre frère, tu fais partie de la famille 💛', '🤝 Tin ! T\'es notre frère, on est heureux que tu sois là !'] };
-      const wm = welcomeMsgs[p];
-      const welcomeText = wm ? wm[Math.floor(Math.random()*wm.length)] : `👋 Bonjour ${p} !`;
-      buildGrid(); updateSuggest(); showToast(welcomeText);
-    };
+    if (state.closed) {
+      btn.disabled = true;
+      btn.style.opacity = '0.6';
+      btn.style.cursor = 'not-allowed';
+    } else {
+      btn.onclick = () => {
+        selectedName = p;
+        const welcomeMsgs = { 'Tin': ['👋 Tin ! Notre frère, tu fais partie de la famille 💛', '🤝 Tin ! T\'es notre frère, on est heureux que tu sois là !'] };
+        const wm = welcomeMsgs[p];
+        const welcomeText = wm ? wm[Math.floor(Math.random()*wm.length)] : `👋 Bonjour ${p} !`;
+        buildGrid(); updateSuggest(); showToast(welcomeText);
+      };
+    }
     grid.appendChild(btn);
   });
 }
@@ -687,6 +695,44 @@ function render() {
   buildGrid();
   updateSuggest();
 
+  // Handle closed state
+  const formCard = document.getElementById('form-card');
+  const closedBanner = document.getElementById('closed-banner');
+  if (state.closed) {
+    if (formCard) formCard.style.display = 'none';
+    const contributors = PEOPLE.filter(p => state.contributions[p] > 0);
+    const total = Object.values(state.contributions).reduce((a,b)=>a+b,0);
+    const listHtml = contributors.map(p => {
+      const amt = state.contributions[p];
+      const c = COLORS[PEOPLE.indexOf(p) % COLORS.length];
+      return `<div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:0.5px solid var(--border)">
+        <div style="width:36px;height:36px;border-radius:50%;background:${c.bg};color:${c.fg};display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:500;flex-shrink:0">${p.slice(0,2).toUpperCase()}</div>
+        <div style="flex:1;font-size:14px;font-weight:500;color:var(--text)">${p}</div>
+        <div style="font-family:'Playfair Display',serif;font-size:16px;font-weight:700;color:var(--success)">${amt} €</div>
+      </div>`;
+    }).join('');
+    closedBanner.innerHTML = `
+      <div style="text-align:center;margin-bottom:20px">
+        <div style="font-size:48px;margin-bottom:10px">🎉</div>
+        <div style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;margin-bottom:8px;color:var(--text)">Cagnotte clôturée !</div>
+        <div style="font-size:14px;color:var(--text-muted);margin-bottom:6px">Un immense merci à tous les contribuants 💛</div>
+        <div style="display:inline-block;background:linear-gradient(90deg,rgba(168,85,247,0.2),rgba(16,185,129,0.2));border:0.5px solid rgba(168,85,247,0.4);border-radius:20px;padding:4px 16px;font-size:13px;color:var(--gold-light)">Total collecté : <strong style="color:var(--success)">${total} €</strong></div>
+      </div>
+      <div style="margin-bottom:20px">
+        ${listHtml || '<div style="text-align:center;color:var(--text-muted);font-size:14px;padding:12px">Aucune contribution enregistrée.</div>'}
+      </div>
+      <div style="text-align:center;padding:20px 16px;background:linear-gradient(135deg,rgba(168,85,247,0.12),rgba(124,58,237,0.08));border-radius:14px;border:0.5px solid rgba(168,85,247,0.25)">
+        <div style="font-size:24px;margin-bottom:8px">🥳</div>
+        <div style="font-family:'Playfair Display',serif;font-size:17px;font-weight:700;margin-bottom:6px;color:var(--text)">À bientôt pour un prochain anniversaire !</div>
+        <div style="font-size:13px;color:var(--text-muted);line-height:1.6">Merci d'avoir participé à cette belle aventure en famille 💛<br>On se retrouve bientôt pour le prochain !</div>
+      </div>
+    `;
+    closedBanner.style.display = 'block';
+  } else {
+    if (formCard) formCard.style.display = 'block';
+    if (closedBanner) closedBanner.style.display = 'none';
+  }
+
   if (pct >= 100) setTimeout(launchConfetti, 300);
 }
 
@@ -826,6 +872,7 @@ function getMsg(name, amt) {
 
 // --- Contribute ---
 function contribute() {
+  if (state.closed) { showToast('🔒 La cagnotte est clôturée — merci à tous !'); return; }
   if (!selectedName) { showToast('👆 Choisissez votre prénom'); return; }
   const amt = parseFloat(document.getElementById('amt').value);
   if (!amt || amt < 1) { showToast('Entrez un montant valide'); return; }
@@ -851,8 +898,9 @@ async function loadRemote() {
     const r = await fetch(API_URL, { headers: { 'Authorization': 'token ' + GIST_TOKEN } });
     const data = await r.json();
     const content = data.files['data.json'].content;
-    state = JSON.parse(content) || { contributions: {}, confirmed: {}, people: null };
+    state = JSON.parse(content) || { contributions: {}, confirmed: {}, people: null, closed: false };
     if (!state.confirmed) state.confirmed = {};
+    if (state.closed === undefined) state.closed = false;
     if (state.people && Array.isArray(state.people)) PEOPLE = state.people;
     render();
     setSyncStatus('ok');
@@ -877,6 +925,7 @@ function loadLocal() {
   if (saved) {
     state = JSON.parse(saved);
     if (!state.confirmed) state.confirmed = {};
+    if (state.closed === undefined) state.closed = false;
     if (state.people && Array.isArray(state.people)) PEOPLE = state.people;
   }
   render();
@@ -1014,6 +1063,7 @@ function showAdminPanel() {
         <button onclick="adminAddPerson()" style="width:100%;padding:10px;background:var(--gold-dark);color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:500;cursor:pointer">+ Ajouter</button>
       </div>
       <div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--border)">
+        <button onclick="adminCloseFundraiser()" style="width:100%;padding:10px;background:${state.closed ? 'transparent' : 'var(--gold-dark)'};border:1.5px solid ${state.closed ? '#10B981' : 'var(--gold-dark)'};border-radius:10px;font-size:14px;font-weight:500;color:${state.closed ? '#10B981' : '#fff'};cursor:pointer;margin-bottom:10px">${state.closed ? '🔓 Rouvrir la cagnotte' : '🔒 Clôturer la cagnotte'}</button>
         <button onclick="adminReset()" style="width:100%;padding:10px;background:transparent;border:1.5px solid #E24B4A;border-radius:10px;font-size:14px;font-weight:500;color:#E24B4A;cursor:pointer">Réinitialiser la cagnotte</button>
       </div>
     </div>
@@ -1041,6 +1091,24 @@ function adminReset() {
   document.getElementById('admin-panel').remove();
   render();
   showToast('Cagnotte réinitialisée');
+}
+
+function adminCloseFundraiser() {
+  if (state.closed) {
+    if (!confirm('Rouvrir la cagnotte ? Les contributions seront à nouveau possibles.')) return;
+    state.closed = false;
+    saveRemote();
+    document.getElementById('admin-panel').remove();
+    render();
+    showToast('🔓 Cagnotte rouverte');
+  } else {
+    if (!confirm('Clôturer la cagnotte ? Plus aucune modification ne sera possible pour les participants.')) return;
+    state.closed = true;
+    saveRemote();
+    document.getElementById('admin-panel').remove();
+    render();
+    showToast('🔒 Cagnotte clôturée — merci à tous !', 4000);
+  }
 }
 
 function adminAddPerson() {
