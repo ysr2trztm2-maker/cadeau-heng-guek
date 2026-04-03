@@ -497,7 +497,8 @@ updateCountdown();
 function buildGrid() {
   const grid = document.getElementById('name-grid');
   grid.innerHTML = '';
-  PEOPLE.forEach(p => {
+  const sortedForGrid = [...PEOPLE].sort((a, b) => (state.contributions[b] || 0) - (state.contributions[a] || 0));
+  sortedForGrid.forEach(p => {
     const btn = document.createElement('button');
     btn.className = 'name-btn' + (state.contributions[p] ? ' paid' : '');
     if (p === selectedName) btn.classList.add('selected');
