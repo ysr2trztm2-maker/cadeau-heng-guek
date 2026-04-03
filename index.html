@@ -672,7 +672,9 @@ function render() {
 
   const list = document.getElementById('person-list');
   list.innerHTML = '';
-  PEOPLE.forEach((p, i) => {
+  const sortedPeople = [...PEOPLE].sort((a, b) => (state.contributions[b] || 0) - (state.contributions[a] || 0));
+  sortedPeople.forEach((p) => {
+    const i = PEOPLE.indexOf(p);
     const amt = state.contributions[p] || 0;
     const c = COLORS[i % COLORS.length];
     const row = document.createElement('div');
