@@ -673,7 +673,7 @@ function render() {
 
   const list = document.getElementById('person-list');
   list.innerHTML = '';
-  const sortedPeople = [...PEOPLE].sort((a, b) => (state.contributions[b] || 0) - (state.contributions[a] || 0));
+  const sortedPeople = [...PEOPLE].sort((a, b) => a.localeCompare(b, 'fr'));
   sortedPeople.forEach((p) => {
     const i = PEOPLE.indexOf(p);
     const amt = state.contributions[p] || 0;
