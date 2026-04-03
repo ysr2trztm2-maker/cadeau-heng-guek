@@ -704,16 +704,27 @@ function render() {
   if (state.closed) {
     if (formCard) formCard.style.display = 'none';
     const contributors = PEOPLE.filter(p => state.contributions[p] > 0).sort((a, b) => state.contributions[b] - state.contributions[a]);
+    const nonContributors = PEOPLE.filter(p => !state.contributions[p] || state.contributions[p] <= 0);
     const total = Object.values(state.contributions).reduce((a,b)=>a+b,0);
-    const listHtml = contributors.map(p => {
-      const amt = state.contributions[p];
-      const c = COLORS[PEOPLE.indexOf(p) % COLORS.length];
-      return `<div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:0.5px solid var(--border)">
-        <div style="width:36px;height:36px;border-radius:50%;background:${c.bg};color:${c.fg};display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:500;flex-shrink:0">${p.slice(0,2).toUpperCase()}</div>
-        <div style="flex:1;font-size:14px;font-weight:500;color:var(--text)">${p}</div>
-        <div style="font-family:'Playfair Display',serif;font-size:16px;font-weight:700;color:var(--success)">${amt} €</div>
-      </div>`;
-    }).join('');
+    const listHtml = [
+      ...contributors.map(p => {
+        const amt = state.contributions[p];
+        const c = COLORS[PEOPLE.indexOf(p) % COLORS.length];
+        return `<div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:0.5px solid var(--border)">
+          <div style="width:36px;height:36px;border-radius:50%;background:${c.bg};color:${c.fg};display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:500;flex-shrink:0">${p.slice(0,2).toUpperCase()}</div>
+          <div style="flex:1;font-size:14px;font-weight:500;color:var(--text)">${p}</div>
+          <div style="font-family:'Playfair Display',serif;font-size:16px;font-weight:700;color:var(--success)">${amt} €</div>
+        </div>`;
+      }),
+      ...nonContributors.map(p => {
+        const c = COLORS[PEOPLE.indexOf(p) % COLORS.length];
+        return `<div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:0.5px solid var(--border);opacity:0.6">
+          <div style="width:36px;height:36px;border-radius:50%;background:${c.bg};color:${c.fg};display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:500;flex-shrink:0">${p.slice(0,2).toUpperCase()}</div>
+          <div style="flex:1;font-size:14px;font-weight:500;color:var(--text-muted)">${p}</div>
+          <div style="font-size:14px;color:var(--text-muted)">😶 0 €</div>
+        </div>`;
+      })
+    ].join('');
     const goalReached = total >= GOAL;
     closedBanner.innerHTML = `
       <div style="text-align:center;margin-bottom:20px">
