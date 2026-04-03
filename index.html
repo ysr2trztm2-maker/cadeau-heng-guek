@@ -703,7 +703,7 @@ function render() {
   const closedBanner = document.getElementById('closed-banner');
   if (state.closed) {
     if (formCard) formCard.style.display = 'none';
-    const contributors = PEOPLE.filter(p => state.contributions[p] > 0);
+    const contributors = PEOPLE.filter(p => state.contributions[p] > 0).sort((a, b) => state.contributions[b] - state.contributions[a]);
     const total = Object.values(state.contributions).reduce((a,b)=>a+b,0);
     const listHtml = contributors.map(p => {
       const amt = state.contributions[p];
